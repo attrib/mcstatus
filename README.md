@@ -13,7 +13,7 @@ Protocol Definition: http://dinnerbone.com/blog/2011/10/14/minecraft-19-has-rcon
 Class to query a Minecraft server with "enable_query=true" in server.properties.
 
 Usage:
-
+```php
 <?php
 require 'MinecraftQuery.php';
 
@@ -22,6 +22,7 @@ $query = new MinecraftQuery('localhost', 25565);
 $status = $query->getStatus(); // get the Status
 $rules = $query->getRules(); // get the Full Info
 ?>
+```
 
 Status:
 * Message of the Day (motd)

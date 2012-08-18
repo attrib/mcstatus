@@ -22,6 +22,7 @@ class MinecraftQuery {
     );
 
   private $host;
+  private $hostname;
   private $port;
   private $timeout;
   private $id;
@@ -34,6 +35,7 @@ class MinecraftQuery {
 
   public function __construct($host, $port, $timeout=10, $id=0, $retries=2) {
     $this->host = gethostbyname($host);
+    $this->hostname = $host;
     $this->port = $port;
     $this->timeout = array('sec' => $timeout, 'usec' => 0);
     $this->id = $id;
@@ -56,12 +58,13 @@ class MinecraftQuery {
   }
 
   private function readPacket() {
-    $len = socket_recvfrom($this->socket, $buff, 1460, 0, ip2long($this->host), $this->port);
+    $ip2long = ip2long($this->host);
+    $len = socket_recvfrom($this->socket, $buff, 1460, 0, $ip2long, $this->port);
     if (!isset($len) || $len === FALSE) {
       throw new Exception();
     }
-    $type = array_shift(unpack('C', substr($buff, 0, 1)));
-    $id = array_shift(unpack('N', substr($buff, 1, 4)));
+    $type = unpack('C', substr($buff, 0, 1));
+    $id = unpack('N', substr($buff, 1, 4));
     return array($type, $id, substr($buff, 5));
   }
 
@@ -177,6 +180,10 @@ class MinecraftQuery {
     if (!empty($data['plugins'])) {
       $data['plugins_raw'] = $data['plugins'];
       list($data['software'], $data['plugins']) = $this->parsePlugins($data['plugins']);
+    }
+
+    if (empty($data['hostname'])) {
+      $data['hostname'] = $this->hostname;
     }
 
     return $data;
